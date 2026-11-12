@@ -73,8 +73,10 @@ wenura-browser/
 * **T0 (Absolute Invariants) & T1 (Allowlist):** Deterministic deny-by-default policy evaluation (never relying on LLM output for authorization).
 * **T2 Dynamic Risk & T3 Metadata Sentinel:** Continuous behavioral monitoring using metadata-only telemetry (enums and stable IDs only—zero raw content access).
 
-### 4.4 Privileged Action Gatekeeper & Consent Modal
-* While the React agent UI plans and reasons freely, any high-impact action (form submission, financial transaction, credential auto-fill, file system write) requires explicit cryptographic capability lease verification and an inline user intent confirmation modal with a visual diff preview.
+### 4.5 Cogumi AI Shield Integration (`Cogumi-security`)
+* **Static & Pipeline Auditing:** Cogumi AI Shield acts as Wenura's pre-flight security scanner, executing systematic pipeline states (*Inventory → Threat Model → Research → Sweep → Panel → Report → Patch*) on all code in `src/wenura/`.
+* **Deterministic Guardrails:** Enforces deterministic evaluation in code (default-to-false-positive panel tallies) to ensure zero false security assertions from LLMs.
+* **Continuous Compliance:** Audits extension scripts and Mojo IPC bindings for vulnerabilities before binary compilation.
 
 ---
 
