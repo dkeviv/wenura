@@ -1,0 +1,7 @@
+# Build outputs and dependencies
+out/
+node_modules/
+.DS_Store
+*.pyc
+.gclient_entries
+.gclient_previous

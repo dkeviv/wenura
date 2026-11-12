@@ -22,7 +22,31 @@
 
 ---
 
-## 3. The 5-Layer Browser Architecture
+## 3. The 5-Layer Browser Architecture & Version Pinning
+
+### 3.1 Pinned Versions & Upstream Baseline
+* **Chromium Milestone:** Milestone 131 (`131.0.6778.x` / branch 6778)
+* **`brave-core` Release Tag:** `v1.73.x` (aligned with Chromium 131)
+* **Build Toolchain:** Google `depot_tools` (`gclient`, GN, Ninja)
+
+### 3.2 Repository Structure & Downstream Overlay
+```text
+wenura-browser/
+├── .gclient                # Google depot_tools multi-repo config
+├── src/
+│   ├── chromium/           # Upstream Chromium source (read-only base)
+│   ├── brave/              # Official brave-core (pulled as downstream submodule/patchset)
+│   └── wenura/             # CUSTOM AGENT LAYER (React WebUI, mojom, utility workers)
+```
+
+### 3.3 Upstream Sync Pipeline
+1. **Pinning:** Lock `.gclient` and `DEPS` to Chromium Milestone 131 and `brave-core` tag `v1.73.x`.
+2. **Isolation:** All custom Wenura agent code resides in `src/wenura/` and hooks into Chromium build targets via standard GN flags (`args.gn`), completely avoiding direct edits to core `src/brave/` files.
+3. **Merging Updates:** When upstream security patches or new Chromium milestones drop, execute `gclient sync` to update the base runtimes cleanly without downstream merge conflicts.
+
+---
+
+## 4. The 5-Layer Browser Architecture
 
 | Layer | Component & Architecture | Exact Open-Source Elements Borrowed / Integrated |
 | :--- | :--- | :--- |
@@ -40,19 +64,36 @@
 * Every tab, extension, utility worker, and renderer runs in an isolated OS-level sandbox (macOS Seatbelt, Windows AppContainer, Linux `seccomp-bpf`).
 * Memory corruption or remote code execution (RCE) in a web renderer cannot escape to the host system.
 
-### 4.2 Indirect Prompt Injection Mitigation (Layer 5 Isolation)
-* When the agent reads arbitrary web pages, DOM parsing and entity extraction run inside the restricted **Utility Process**.
-* Malicious text on a webpage designed to hijack the AI prompt stream is contained within the unprivileged utility sandbox and cannot execute system-level commands or access user credentials.
+### 4.2 Indirect Prompt Injection Mitigation (Layer 5 GLiNER Isolation)
+* When the agent reads arbitrary web pages, DOM parsing and entity extraction run inside the restricted **Utility Process** using **GLiNER** via ONNX Runtime.
+* Malicious text on a webpage designed to hijack the AI prompt stream is extracted, classified, and tagged strictly as *Untrusted Data*, neutralizing prompt injection while preserving clean semantic entities for the agent.
 
-### 4.3 Privileged Action Gatekeeper
-* While the React agent UI plans and reasons freely, any high-impact action (form submission, financial transaction, credential auto-fill, file system write) requires explicit cryptographic or user-intent policy confirmation.
+### 4.3 Domo Action Security Integration (T0–T3 Tiers & Leases)
+* **Capability Leases:** Short-lived cryptographic tokens binding `subject + session + target asset + operation`.
+* **T0 (Absolute Invariants) & T1 (Allowlist):** Deterministic deny-by-default policy evaluation (never relying on LLM output for authorization).
+* **T2 Dynamic Risk & T3 Metadata Sentinel:** Continuous behavioral monitoring using metadata-only telemetry (enums and stable IDs only—zero raw content access).
+
+### 4.4 Privileged Action Gatekeeper & Consent Modal
+* While the React agent UI plans and reasons freely, any high-impact action (form submission, financial transaction, credential auto-fill, file system write) requires explicit cryptographic capability lease verification and an inline user intent confirmation modal with a visual diff preview.
 
 ---
 
-## 5. Implementation Epics
+## 5. Security Epics and User Stories
 
-* **Epic 1:** Monorepo Setup & Build Environment (`depot_tools` + Chromium checkout + `brave-core` patch overlay).
-* **Epic 2:** Network-Level Ad/Tracker Blocking (`adblock-rust`) & Telemetry Stripping Integration.
-* **Epic 3:** Custom `ai_agent.mojom` Interface & Type-Safe IPC Pipeline.
-* **Epic 4:** Native `chrome://workspace` WebUI Agent Shell (React + Vite + ElevenLabs audio/agent components).
-* **Epic 5:** Sandboxed `UtilityProcess` Integration for Local ONNX Inference & GLiNER.
+* **Epic 1: IPC Contracts & Sandboxed Utility Compute (GLiNER & ONNX)**
+  * *Story 1.1:* Define type-safe `ai_agent.mojom` IPC interfaces for cross-process communication.
+  * *Story 1.2:* Implement `UtilityProcessHost` and C++ utility worker hosting ONNX Runtime and GLiNER entity extraction.
+  * *Story 1.3:* Write unit tests verifying that prompt injection payloads in DOM text are neutralized and tagged as untrusted data.
+
+* **Epic 2: Domo Action Security Gateway & Policy Tiers (T0–T2)**
+  * *Story 2.1:* Implement capability lease issuance, validation, and revocation epoch checks.
+  * *Story 2.2:* Implement T0 (absolute invariants) and T1 (deterministic allowlist) policy evaluation engines.
+  * *Story 2.3:* Implement T2 dynamic risk engine for sequence anomaly and blast radius detection.
+
+* **Epic 3: Human-in-the-Loop Consent & User Intent Gatekeeper**
+  * *Story 3.1:* Implement Privileged Action Gatekeeper intercepting requests at the Mojo IPC boundary.
+  * *Story 3.2:* Build the React intent confirmation modal providing visual diff previews for high-impact actions.
+
+* **Epic 4: T3 Telemetry-Only AI Sentinel & Audit Ledger**
+  * *Story 4.1:* Implement T3 AI Sentinel receiving metadata-only telemetry streams with no read tools or raw content access.
+  * *Story 4.2:* Implement append-only tamper-evident audit ledger recording signed action requests, policy decisions, and execution receipts.
