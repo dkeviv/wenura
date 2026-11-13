@@ -2,7 +2,7 @@
 
 **Status:** Draft
 **Scope:** Security architecture for Wenura — an AI-native browser with an internal Domo agent
-**Source material:** Domo `PRD.md` (V1, 7 items, implemented), `ACTION_SECURITY_REQUIREMENTS.md` (V2, Domo-as-security), `REQUIREMENTS.md` FR-8 (event registry + pre-action gates), `cogumi-AI-shield` (actor model, deterministic policy)
+**Source material:** Domo `PRD.md` (V1, 7 items, implemented) and `REQUIREMENTS.md` FR-8 (event registry + pre-action gates) are direct inputs. Domo `ACTION_SECURITY_REQUIREMENTS.md` is a **separate product** — Domo as a standalone security web agent — from which Wenura borrows ideas (T0–T3 tiers, capability leases, fail-closed posture) without inheriting its dependency constraints. `cogumi-AI-shield` is likewise a reference for the actor model and deterministic policy.
 
 ---
 
@@ -228,7 +228,7 @@ Sequenced by dependency. Drift management is deliberately late.
 2. **"Origin class" definition** — needs pinning to eTLD+1 or lease-declared scope before implementation, or it will be interpreted loosely.
 3. **Goal-scope representation** — how a semantic goal is encoded such that divergence is computable deterministically.
 4. **Quarantine UX** — whether the respawn is announced inline (recommended: yes, one line) or silent. Silent respawn produces an unexplained discontinuity the first time it matters.
-5. **V1/V2 conflict** — `ACTION_SECURITY_REQUIREMENTS.md` §1 states V2 "MUST NOT depend on the V1 extension." Under a single-product framing this line requires rewriting.
+5. ~~**V1/V2 conflict**~~ — **Resolved.** `ACTION_SECURITY_REQUIREMENTS.md` describes a *separate product* (Domo as a standalone security web agent), not a Wenura input. Wenura borrows ideas from it — T0–T3 tiers, capability leases, fail-closed posture — without inheriting its dependency constraints. Its §1 statement that V2 "MUST NOT depend on the V1 extension" is a claim about that product, not about Wenura. Nothing to reconcile.
 6. **Un-quarantine authority** — human-only; recommended *not* to reuse the policy-mutation secret, since making routine review expensive pushes users to disable the detector.
 
 ---
