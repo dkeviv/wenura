@@ -67,7 +67,13 @@ wenura/
 ├── src/
 │   ├── chromium/           # upstream Chromium source (read-only base)
 │   ├── downstream/         # Brave-derived privacy/hardening patchset
-│   └── wenura/             # Wenura's own code — agent, IPC, WebUI, utility workers
+│   └── wenura/             # WENURA MODULAR OVERLAY
+│       ├── core/           # Abstract interfaces (AgentRuntimeAdapter, ModelProvider, VoiceEngine, MemoryProvider)
+│       ├── agents/         # Hotswappable agent implementations (Domo / pi-agent-core)
+│       ├── models/         # LLM providers (Local ONNX/WebGPU Qwen vs. Cloud Fallback)
+│       ├── voice/          # Voice engines (Kokoro TTS, Whisper Tiny STT, Browser Native)
+│       ├── ui/             # chrome://workspace React + Vite WebUI surface
+│       └── mojom/          # Typed IPC interfaces (ai_agent.mojom)
 ```
 
 ### 3.3 Upstream Sync Pipeline
