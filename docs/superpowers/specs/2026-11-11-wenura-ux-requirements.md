@@ -39,11 +39,13 @@ While Wenura adopts and respects the spatial ergonomics pioneered by browsers li
 * **Vertical Sidebar Layout:** Tabs and active task streams are organized vertically on the left side, eliminating top-heavy horizontal tab clutter.
 * **Minimalist Borderless Window:** Removing traditional browser clutter, hiding the standard horizontal tab strip, and letting website content breathe with rounded window corners and custom multi-mode themes (Night `#0B0C11`, Light `#F7F7F9`, and Warm `#FAF9F5`).
 
-### 4.2 Where Wenura Goes Beyond (The AI-Native / Voice Twist)
-* **AI-Managed Topics (`S-05`) vs. Manual Folders:** Instead of requiring users to manually drag and create spaces or folders, Wenura's local ONNX/GLiNER engine automatically clusters open tabs into dynamic semantic task streams based on active user intent.
-* **Agent Context Pins vs. Static Pinning:** Rather than static pinned tabs, tabs actively operated on by the agent are pinned dynamically as "Context Chips" for the current task, and automatically archive or collapse into a summary card upon task completion.
-* **Voice-Driven Tab Navigation via the Sun Orb:** Navigation and sidebar management are fully voice-enabled (*"Switch to my Tokyo trip tabs"*, *"Close everything except flight booking"*), accompanied by live agent action telemetry (`S-11`).
-* **The Persistent Sun Orb Anchor:** Stationed in the vertical sidebar or workspace centerpiece, the living 2D Sun Orb remains always accessible for voice input, reacting and glowing in real-time as the user manages their browsing session.
+### 4.3 Settings Model: Inherit and Extend
+Following the proven ergonomic model of modern browsers, Wenura avoids redundant engineering by inheriting **95% of standard Chromium settings** directly (`chrome://settings`, history, bookmarks, sync, password manager), ensuring zero learning curve for core browser functions. 
+
+Wenura adds a dedicated, lightweight **AI & Voice Control Center** accessible from the vertical sidebar to manage agent-specific configurations:
+* **Voice Subsystem Hotswap:** Select and configure STT engines (Browser Native vs. Whisper Tiny) and TTS engines (Browser Native vs. Kokoro).
+* **Local vs. Cloud Compute:** Toggle between default on-device ONNX inference (Qwen 0.6B) and opt-in Cloud Fallback providers (OpenRouter, OpenAI, DeepSeek, Kimi, Gemini) with secure per-provider API key storage.
+* **Security & Policy Inspection:** View active policy tiers, capability leases, and audit ledger telemetry controls.
 
 ### 3.1 Color Roles & Themes
 * **Accent:** Vibrant pure yellow (`primitive.color.accent.500` = `#FFD60A`), with near-black text on accent (`#0B0C11`).
