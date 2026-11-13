@@ -263,9 +263,11 @@ Sequenced by dependency. Drift management is deliberately late; two of its prere
   * *3.1* Implement the privileged-action gatekeeper at the IPC boundary.
   * *3.2* Build the native consent surface with a visual diff preview for high-impact actions.
 
-* **Epic 4: Audit Ledger & T3 Sentinel**
-  * *4.1* Implement the append-only, tamper-evident ledger recording signed requests, decisions, and receipts.
-  * *4.2* Implement the T3 Sentinel over metadata-only telemetry, with no read tools or raw content access.
+* **Epic 5: Voice-First Multimodal Subsystem & Hotswap Engine**
+  * *5.1* Define unified speech-to-text and text-to-speech abstraction contracts in the agent shell layer.
+  * *5.2* Integrate Chromium built-in speech recognition and speech synthesis as default system providers.
+  * *5.3* Implement sandboxed utility process execution hosting local **Kokoro** (TTS) and **Whisper Tiny** (STT) models via ONNX Runtime.
+  * *5.4* Build settings management interface in `chrome://settings` enabling seamless, runtime hotswapping between native and local AI voice providers without browser restart.
 
 ---
 
