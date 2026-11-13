@@ -47,6 +47,20 @@ Wenura adds a dedicated, lightweight **AI & Voice Control Center** accessible fr
 * **Local vs. Cloud Compute:** Toggle between default on-device ONNX inference (Qwen 0.6B) and opt-in Cloud Fallback providers (OpenRouter, OpenAI, DeepSeek, Kimi, Gemini) with secure per-provider API key storage.
 * **Security & Policy Inspection:** View active policy tiers, capability leases, and audit ledger telemetry controls.
 
+## 5. Official Brand Identity & Logo System
+
+Approved on November 12, 2026, the official Wenura brand identity system is anchored by a master symbol pairing a white abstract "W" with one continuous ray, a burnt-orange outline (`#C74C06`), and a 45° rising-sun gradient (`#D72135` red, `#FF6B25` orange, `#FFD60A` vibrant yellow), paired with outlined lowercase Didot Bold lettering in near-black (`#0B0C11`).
+
+### 5.1 Asset Kit (`wenura-logo/final/`)
+* **Sun Symbol:** Scalable master SVG plus transparent PNG resolutions ranging from 16px to 1024px.
+* **Wordmark & Horizontal Lockup:** Scalable SVGs and responsive PNG asset kits (160px to 1600px wide) for UI headers and promotional surfaces.
+* **ICO Favicon:** Multi-resolution bundle (16px, 32px, 48px) for browser tabs and native window chrome.
+* **Design Guidelines:** The sun gradient and abstract W structure visually reinforce the living 2D Sun Orb core interactive component across all desktop and mobile surfaces.
+
+---
+
+## 3. Design System v1.4.0 Alignment & Token Mapping
+
 ### 3.1 Color Roles & Themes
 * **Accent:** Vibrant pure yellow (`primitive.color.accent.500` = `#FFD60A`), with near-black text on accent (`#0B0C11`).
 * **Modes:** 
