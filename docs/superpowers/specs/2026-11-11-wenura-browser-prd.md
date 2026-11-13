@@ -3,7 +3,16 @@
 **Status:** Draft
 **Product:** Wenura — an AI-native browser with an internal agent
 
-**Provenance note:** This document states Wenura's own requirements. Prior art was consulted for **ideas only** — Domo (extension-era web agent), a standalone action-security concept, an agent-facing policy-enforcement extension, and Chromium's downstream ecosystem. Those sources are not Wenura components and are not integrated into it; where a principle was adopted, it is stated here in Wenura's terms. No external document is normative for this product.
+**Provenance note:** Wenura builds on existing open-source work. This document distinguishes four categories, and the distinction matters — some are real dependencies, others are ideas only.
+
+| Category | What it means | Items |
+|---|---|---|
+| **Adopted as-is** | Real code dependencies, taken unchanged | A Brave-derived privacy/hardening patchset; the network-level ad/tracker blocking engine; the browser-level agent loop |
+| **Adopted as needed** | Optional per-surface | Audio/voice UI components |
+| **Code borrowed** | Source we port into Wenura | The Domo agent runtime, adapted to a browser core |
+| **Concepts borrowed** | Ideas only — **no code, nothing integrated** | Deterministic agent-facing policy enforcement; standalone action-security tiering |
+
+Only the first three appear anywhere in the architecture below. Where a concept was borrowed, it is stated as Wenura's own requirement and its source is not normative.
 
 ---
 
@@ -25,6 +34,7 @@ The organizing rule: **the agent requests; deterministic policy decides; the IPC
 
 ### Goals
 * **Agent-first architecture** — the agent lives in a native WebUI surface with first-class control over view orchestration, DOM observation, and task execution.
+* **Voice-first multimodal interaction** — voice as a first-class citizen alongside keyboard input, powered by Chromium built-in STT/TTS plus hotswap-configurable local **Kokoro** (TTS) and **Whisper Tiny** (STT) models running in sandboxed utility workers, managed directly via `chrome://settings`.
 * **Speed and privacy by default** — network-level ad/tracker blocking and telemetry stripping inherited from the upstream fork.
 * **Zero-trust security model** — untrusted content and its parsing isolated from the agent's control loop by process boundaries and typed IPC.
 * **Deterministic authorization** — every consequential action gated by code-computed policy, never by model judgment.
@@ -69,10 +79,10 @@ wenura/
 
 | Layer | Component | Responsibility |
 |---|---|---|
-| **1** | **Upstream base** | Chromium engine and Blink renderer; the downstream privacy/hardening patchset; GN/Ninja toolchain |
-| **2** | **Network & core protection** | Network-level ad/tracker blocking; telemetry stripping; fingerprinting defenses |
+| **1** | **Upstream base** | Chromium engine and Blink renderer; **`brave-core`** adopted as-is; GN/Ninja toolchain |
+| **2** | **Network & core protection** | **`adblock-rust`** plus the upstream network-filter hooks, adopted as-is; telemetry stripping; fingerprinting defenses |
 | **3** | **Sandboxed IPC** | Typed IDL interfaces compiled to secure cross-process bindings; strict serialization between agent and browser core |
-| **4** | **Agent shell & WebUI** | Privileged system-page host for the agent surface; React + Vite frontend; audio/voice components; the browser-level agent loop |
+| **4** | **Agent shell & WebUI** | Privileged system-page host for the agent surface; React + Vite frontend; **`pi-agent-core`** as the browser-level agent loop, ported from Domo; audio/voice components adopted as needed |
 | **5** | **Utility worker compute** | OS-sandboxed utility process hosting local small-model inference and entity extraction |
 
 ---
@@ -91,14 +101,13 @@ wenura/
 |---|---|---|
 | 1 | **Provenance & untrusted ingestion** | All web content marked untrusted at ingestion; renderer/process identity is the provenance; no cross-tab laundering |
 | 2 | **Credential exclusion by construction** | Sensitive fields excluded before they reach agent context; auth and payment steps hand control back to the user |
-| 3 | *(reserved)* | — |
-| 4 | **Sticky value provenance** | Derived values retain the taint of their sources; taint propagates through every transformation |
-| 5 | **Action authorization gate** | Single fail-closed execution barrier; re-verifies state immediately before dispatch (time-of-check / time-of-use) |
-| 6 | **Tool-boundary exfiltration sinks** | Every outbound sink (navigation, form submission, remote model call) checked for tainted values before it fires |
-| 7 | **Ephemeral lease storage** | Privilege grants held in process memory only, with explicit expiry; wiped on navigation, restart, or restore |
-| 8 | **Human-in-the-loop & audit ledger** | Consent bound to an action hash; append-only, tamper-evident ledger recording metadata only |
+| 3 | **Sticky value provenance** | Derived values retain the taint of their sources; taint propagates through every transformation |
+| 4 | **Action authorization gate** | Single fail-closed execution barrier; re-verifies state immediately before dispatch (time-of-check / time-of-use) |
+| 5 | **Tool-boundary exfiltration sinks** | Every outbound sink (navigation, form submission, remote model call) checked for tainted values before it fires |
+| 6 | **Ephemeral lease storage** | Privilege grants held in process memory only, with explicit expiry; wiped on navigation, restart, or restore |
+| 7 | **Human-in-the-loop & audit ledger** | Consent bound to an action hash; append-only, tamper-evident ledger recording metadata only |
 
-**Stage 3 is reserved, not pending.** In an extension context, string framing and schema serialization are needed because messages cross an untrusted string channel. In Wenura that channel does not exist — typed IPC replaces it. The mechanism is unnecessary; the invariant it protected is retained in §4.1.
+**Note on framing.** The extension-era pipeline carried an additional anti-escape stage (nonce framing plus strict schema serialization) because its messages crossed an untrusted *string* channel. Wenura has no such channel — typed IPC replaces it, so that stage is absent rather than deferred. The invariant it protected is retained in §4.1: provenance survives serialization.
 
 ### 4.3 Actor Model
 
@@ -231,8 +240,9 @@ Sequenced by dependency. Drift management is deliberately late; two of its prere
 15. Forensic capture and SIEM/SOAR export.
 16. T3 Sentinel correlation over drift events (telemetry-only; may never authorize).
 
-### Phase 5 — Agent as Security Provider
+### Phase 5 — Agent as Security Provider & Voice Multimodal Architecture
 17. Extend gates to protect the user against external agents and malicious content.
+18. **Voice-First Multimodal Subsystem:** Implement Chromium built-in Speech Recognition/Synthesis alongside local **Kokoro** (TTS) and **Whisper Tiny** (STT) models running in sandboxed utility workers, with full hotswap configuration exposed in `chrome://settings`.
 
 ---
 
